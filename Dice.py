@@ -3,6 +3,7 @@ import pandas as pd
 from itertools import combinations_with_replacement
 import operator as op 
 from functools import reduce
+from _collections import defaultdict
 
 PHa = 0.5
 PFa = 0.25
@@ -43,7 +44,7 @@ def Atk_P(M, focus = False):
                 if ((hit_counts[i+1][0]) < hit_counts[i][0]):
                     m = m + 1
     if focus == True:
-        hits = dict()
+        hits = dict(list())
         for atk_combs in combinations_with_replacement(A_dice, M):
             print(atk_combs)
             count_h = atk_combs.count('h') 
@@ -59,10 +60,16 @@ def Atk_P(M, focus = False):
             items = items[::-1]
             P_holder = nCr(M, items[0])*nCr(M-items[0], items[1])*nCr(m-items[0]-items[1], items[2])* \
                 (PHa**(hit_counts[i][0]))*(PFa**(hit_counts[i][1]))*(PBa**(hit_counts[i][2]))
-            hits[str(fhit_counts[i])].append(P_holder)
+            if str(fhit_counts[i][0]) in hits.keys():
+                hits[str(fhit_counts[i][0])].append(P_holder)
+            else:
+                hits[str(fhit_counts[i][0])]= [P_holder]
+        for key in hits.keys():
+            PH[0, int(key)] = sum(hits[key])
             
             
     Atk_EV = 0
+    m = M
     for i in range(len(PH[0,:])-1, -1, -1):
         Atk_EV = PH[0,i]*(m-i) + Atk_EV
     return hit_counts, atk_combs, PH[0,:], Atk_EV
@@ -94,4 +101,4 @@ def Def_P(N, focus = False):
 
 hit_counts, atk_combs, PH, Atk_EV = Atk_P(3, focus= True)
 
-evade_counts, def_combs, PE, Def_EV = Def_P(3, focus= False)
+# evade_counts, def_combs, PE, Def_EV = Def_P(3, focus= False)
