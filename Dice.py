@@ -23,7 +23,7 @@ def nCr(n,r):
     den = reduce(op.mul, range(1, r+1, 1), 1)
     return num/den
 
-def find_PH(M):
+def find_PH_r(M):
     hit_counts = list()
     PH = np.zeros((1,M+1))
     m = 0
@@ -45,15 +45,53 @@ def find_PH(M):
         elif (i == 0):
             m = m + 1
     return PH
+    
+def find_PH_f(M):
+    m = 0
+    hits = dict(list())
+    hit_counts = list()
+    fhit_counts = list()
+    for atk_combs in combinations_with_replacement(A_dice, M):
+        print("roll combos", atk_combs)
+        count_h = atk_combs.count('h') 
+        count_f = atk_combs.count('f')
+        count_b = atk_combs.count('b')
+        fct_h = atk_combs.count('h')+atk_combs.count('f')
+        fct_b = atk_combs.count('b')
+        hit_counts.append((count_h, count_f, count_b))
+        fhit_counts.append((fct_h, fct_b))
+    hit_counts = list(dict.fromkeys(hit_counts))
+    for i in range(len(hit_counts)):
+        items = np.sort(hit_counts[i][:])
+        items = items[::-1]
+        P_holder = nCr(M, items[0])*nCr(M-items[0], items[1])*nCr(m-items[0]-items[1], items[2])* \
+            (PHa**(hit_counts[i][0]))*(PFa**(hit_counts[i][1]))*(PBa**(hit_counts[i][2]))
+        if str(fhit_counts[i][0]) in hits.keys():
+            hits[str(fhit_counts[i][0])].append(P_holder)
+        else:
+            hits[str(fhit_counts[i][0])]= [P_holder]
+    for key in hits.keys():
+        PH[0, M- int(key)] = sum(hits[key])
+    return PH
 
-
-def P_nsuccess(M, n, a_or_d = 'a'):
+def P_nsuccess_f(M, n, a_or_d = 'a'):
     #the probability of n successes in M dice rolled without modification or re-roll
     # M is the number of dice
     # n is the number of successes (hits or evades)
     # a_or_d is either 'a' or 'd'
     if a_or_d == 'a':
-        PH = find_PH(M)
+        PH = find_PH_f(M)
+        if n < len(PH[0,:]):
+            P_n = PH[0, M-n]
+    return PH, P_n
+
+def P_nsuccess_r(M, n, a_or_d = 'a'):
+    #the probability of n successes in M dice rolled without modification or re-roll
+    # M is the number of dice
+    # n is the number of successes (hits or evades)
+    # a_or_d is either 'a' or 'd'
+    if a_or_d == 'a':
+        PH = find_PH_r(M)
         if n < len(PH[0,:]):
             P_n = PH[0, M-n]
     return PH, P_n
@@ -61,8 +99,7 @@ def P_nsuccess(M, n, a_or_d = 'a'):
 
 #Calc nominal dice roll probs
 def Atk_P(M, focus = False, target_lock = False):
-    hit_counts = list()
-    fhit_counts = list()
+    
     m = 0
 
     #Decision Branch
@@ -72,34 +109,13 @@ def Atk_P(M, focus = False, target_lock = False):
 
     #### Raw Roll ####
     if focus == False:
-        PH = find_PH(M)
+        PH = find_PH_r(M)
                     
-    #Calc the Focus hocus pocus
+    #### Calc the Focus ####
     if (focus == True) and (target_lock == False):
-        hits = dict(list())
-        for atk_combs in combinations_with_replacement(A_dice, M):
-            print("roll combos", atk_combs)
-            count_h = atk_combs.count('h') 
-            count_f = atk_combs.count('f')
-            count_b = atk_combs.count('b')
-            fct_h = atk_combs.count('h')+atk_combs.count('f')
-            fct_b = atk_combs.count('b')
-            hit_counts.append((count_h, count_f, count_b))
-            fhit_counts.append((fct_h, fct_b))
-        hit_counts = list(dict.fromkeys(hit_counts))
-        for i in range(len(hit_counts)):
-            items = np.sort(hit_counts[i][:])
-            items = items[::-1]
-            P_holder = nCr(M, items[0])*nCr(M-items[0], items[1])*nCr(m-items[0]-items[1], items[2])* \
-                (PHa**(hit_counts[i][0]))*(PFa**(hit_counts[i][1]))*(PBa**(hit_counts[i][2]))
-            if str(fhit_counts[i][0]) in hits.keys():
-                hits[str(fhit_counts[i][0])].append(P_holder)
-            else:
-                hits[str(fhit_counts[i][0])]= [P_holder]
-        for key in hits.keys():
-            PH[0, M- int(key)] = sum(hits[key])
+        PH = find_PH_f(M)
 
-    #Calc Target Lock Dice roll
+    #### Calc Target Lock Dice roll ####
     if target_lock == True:
         PH_rr = PH.copy()
         if focus == False:
@@ -124,8 +140,24 @@ def Atk_P(M, focus = False, target_lock = False):
                     J = success - N
                     K = M-N
                     print("N =", N, "M = ", M, "J = ", J, "K = ", K, "successes = ", success)
-                    ph, p_first_roll = P_nsuccess(M, N)
-                    ph, p_second_roll = P_nsuccess(K, J)
+                    ph, p_first_roll = P_nsuccess_r(M, N)
+                    ph, p_second_roll = P_nsuccess_r(K, J)
+                    p_holder = p_first_roll*p_second_roll + p_holder
+                    if (N == n[-1]):
+                        PH_rr[0, M-success] = p_holder
+            PH = PH_rr[:]
+
+        if focus == True:            
+            for success in range(M+1):
+                n = range(success, -1, -1)
+                p_holder = 0
+                for N in n:
+                    
+                    J = success - N
+                    K = M-N
+                    print("N =", N, "M = ", M, "J = ", J, "K = ", K, "successes = ", success)
+                    ph, p_first_roll = P_nsuccess_f(M, N)
+                    ph, p_second_roll = P_nsuccess_f(K, J)
                     p_holder = p_first_roll*p_second_roll + p_holder
                     if (N == n[-1]):
                         PH_rr[0, M-success] = p_holder
