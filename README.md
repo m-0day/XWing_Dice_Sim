@@ -12,6 +12,6 @@ The sim accurately simulates attack rolls with or without re-rolls (target lock)
 
 ![Attack Dice pdfs](/Figure_1.png)
 
-Moral of the story: Given the choice between Focus and Target Lock always choose Focus. If you can choose both, choose both.
+Moral of the story: Given the choice between Focus and Target Lock always choose Focus because it can be used for defense as well. If you can choose both, always choose both target lock and focus.
 
 There are other much more sophisticated [X-Wing Dice Calculator](http://xwing.gateofstorms.net/2/multi/) dice simulators out there but I wanted something to show to my 7 year old that would make sense to him.
