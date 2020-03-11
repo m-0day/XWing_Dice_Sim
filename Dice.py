@@ -265,12 +265,15 @@ def Def_P(M, focus = False, num_evade = 0):
         Def_EV = PE[0,i]*(m-i) + Def_EV
     return PE[0,:], Def_EV
 
-fig, axes = plt.subplots(4, 5, sharey=True)
+fig, axes = plt.subplots(4, 5, sharey=True, sharex=True)
 fig.suptitle('X-wing Attack Dice Probability Density Functions (pdf)')
 axes[0,0].set_ylabel('Target Lock and Focus')
 axes[1,0].set_ylabel('Focus')
 axes[2,0].set_ylabel('Target Lock')
 axes[3,0].set_ylabel('No dice mods')
+axes.set_ylim(-0, 1)
+axes.set_xlim(-0.5,6.5)
+fig.text(0.35, 0.05, 'Number of Dice Rolled', va='center', rotation='horizontal')
 
 i = 0
 for f in (True, False):   
@@ -280,11 +283,8 @@ for f in (True, False):
             PH, Atk_EV = Atk_P(M, focus= f, target_lock= tl)
             print ('Number of red dice =', M, ', Focus = ', f, ', Target Lock = ', tl, '\n', 'PH = ', PH, '. Expected number of hits = ', Atk_EV)
             axes[i, j].bar(np.arange(len(PH)-1, -1, -1), PH, color = 'red', alpha = 0.7)
-            axes[i,j].set_ylim(-0, 1)
-            axes[i,j].set_xlim(-0.5,6.5)
-            axes[i,j].hlines(Atk_EV, -0.5, 6.5, color = 'r', linestyle = '--')
+            s = "Exp. Hits = " + str(Atk_EV)
+            axes[i,j].text(0.25, 0.85, s, color = 'black')
         i = i + 1
-
-
 
 plt.show()
