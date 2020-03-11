@@ -5,6 +5,7 @@ from itertools import chain
 import operator as op 
 from functools import reduce
 from _collections import defaultdict
+import matplotlib.pyplot as plt 
 
 PHa = 0.5
 PFa = 0.25
@@ -23,6 +24,7 @@ def nCr(n,r):
     den = reduce(op.mul, range(1, r+1, 1), 1)
     return num/den
 
+# Find prob of hit "raw"
 def find_PH_r(M):
     hit_counts = list()
     PH = np.zeros((1,M+1))
@@ -46,8 +48,10 @@ def find_PH_r(M):
             m = m + 1
     return PH
     
+# Find prob of hit "focus"
 def find_PH_f(M):
     m = 0
+    PH = np.zeros((1,M+1))
     hits = dict(list())
     hit_counts = list()
     fhit_counts = list()
@@ -74,32 +78,42 @@ def find_PH_f(M):
         PH[0, M- int(key)] = sum(hits[key])
     return PH
 
+# Prob of n successes "focus". This is necessary for re-rolls.
 def P_nsuccess_f(M, n, a_or_d = 'a'):
     #the probability of n successes in M dice rolled without modification or re-roll
     # M is the number of dice
     # n is the number of successes (hits or evades)
     # a_or_d is either 'a' or 'd'
     if a_or_d == 'a':
-        PH = find_PH_f(M)
-        if n < len(PH[0,:]):
-            P_n = PH[0, M-n]
-    return PH, P_n
+        P = find_PH_f(M)
+        if n < len(P[0,:]):
+            P_n = P[0, M-n]
+    if a_or_d == 'd':
+        P = find_PE_f(M)
+        if n < len(P[0,:]):
+            P_n = P[0, M-n]
+    return P, P_n
 
+# Prob of n successes "raw"
 def P_nsuccess_r(M, n, a_or_d = 'a'):
     #the probability of n successes in M dice rolled without modification or re-roll
     # M is the number of dice
     # n is the number of successes (hits or evades)
     # a_or_d is either 'a' or 'd'
     if a_or_d == 'a':
-        PH = find_PH_r(M)
-        if n < len(PH[0,:]):
-            P_n = PH[0, M-n]
-    return PH, P_n
+        P = find_PH_r(M)
+        if n < len(P[0,:]):
+            P_n = P[0, M-n]
+    if a_or_d == 'd':
+        P = find_PE_r(M)
+        if n < len(P[0,:]):
+            P_n = P[0, M-n]
+    return P, P_n
 
 
-#Calc nominal dice roll probs
+#### ATTACK ####
 def Atk_P(M, focus = False, target_lock = False):
-    
+    PH = np.zeros((1,M+1))
     m = 0
 
     #Decision Branch
@@ -108,7 +122,7 @@ def Atk_P(M, focus = False, target_lock = False):
     #If TL do TL then Focus
 
     #### Raw Roll ####
-    if focus == False:
+    if (focus == False):
         PH = find_PH_r(M)
                     
     #### Calc the Focus ####
@@ -117,6 +131,7 @@ def Atk_P(M, focus = False, target_lock = False):
 
     #### Calc Target Lock Dice roll ####
     if target_lock == True:
+        
         PH_rr = PH.copy()
         if focus == False:
             
@@ -171,7 +186,10 @@ def Atk_P(M, focus = False, target_lock = False):
         Atk_EV = PH[0,i]*(m-i) + Atk_EV
     return PH[0,:], Atk_EV
 
-def Def_P(N, focus = False):
+
+
+#### EVADE ####
+def find_PE_r(N, focus = False):
     evade_counts = list()
     PE = np.zeros((1,N+1))
     n = 0
@@ -194,8 +212,79 @@ def Def_P(N, focus = False):
         Def_EV = 0
         for i in range(len(PE[0,:])-1, -1, -1):
             Def_EV = PE[0,i]*(n-i) + Def_EV
-    return evade_counts, def_combs, PE[0,:], Def_EV
+    return PE
 
-hit_counts, atk_combs, PH, Atk_EV = Atk_P(3, focus= False, target_lock=True)
+def find_PE_f(M):
+    m = 0
+    PE = np.zeros((1,M+1))
+    hits = dict(list())
+    hit_counts = list()
+    fhit_counts = list()
+    for atk_combs in combinations_with_replacement(A_dice, M):
+        print("roll combos", atk_combs)
+        count_e = atk_combs.count('e') 
+        count_f = atk_combs.count('f')
+        count_b = atk_combs.count('b')
+        fct_e = atk_combs.count('e')+atk_combs.count('f')
+        fct_b = atk_combs.count('b')
+        hit_counts.append((count_e, count_f, count_b))
+        fhit_counts.append((fct_e, fct_b))
+    hit_counts = list(dict.fromkeys(hit_counts))
+    for i in range(len(hit_counts)):
+        items = np.sort(hit_counts[i][:])
+        items = items[::-1]
+        P_holder = nCr(M, items[0])*nCr(M-items[0], items[1])*nCr(m-items[0]-items[1], items[2])* \
+            (PHa**(hit_counts[i][0]))*(PFa**(hit_counts[i][1]))*(PBa**(hit_counts[i][2]))
+        if str(fhit_counts[i][0]) in hits.keys():
+            hits[str(fhit_counts[i][0])].append(P_holder)
+        else:
+            hits[str(fhit_counts[i][0])]= [P_holder]
+    for key in hits.keys():
+        PE[0, M- int(key)] = sum(hits[key])
+    return PE
 
-# evade_counts, def_combs, PE, Def_EV = Def_P(3, focus= False)
+#Calc nominal evade dice rolls
+def Def_P(M, focus = False, num_evade = 0):
+    PE = np.zeros((1,M+1))
+    m = 0
+
+    #### Raw Roll ####
+    if (focus == False):
+        PE = find_PE_r(M)
+                    
+    #### Calc the Focus ####
+    if (focus == True):
+        PE = find_PE_f(M)
+
+    # need one for focus AND evade
+    
+
+    Def_EV = 0
+    m = M
+    for i in range(len(PE[0,:])-1, -1, -1):
+        Def_EV = PE[0,i]*(m-i) + Def_EV
+    return PE[0,:], Def_EV
+
+fig, axes = plt.subplots(4, 5, sharey=True)
+fig.suptitle('X-wing Attack Dice Probability Density Functions (pdf)')
+axes[0,0].set_ylabel('Target Lock and Focus')
+axes[1,0].set_ylabel('Focus')
+axes[2,0].set_ylabel('Target Lock')
+axes[3,0].set_ylabel('No dice mods')
+
+i = 0
+for f in (True, False):   
+    for tl in (True, False):
+        for M in range(1,6):
+            j = M-1
+            PH, Atk_EV = Atk_P(M, focus= f, target_lock= tl)
+            print ('Number of red dice =', M, ', Focus = ', f, ', Target Lock = ', tl, '\n', 'PH = ', PH, '. Expected number of hits = ', Atk_EV)
+            axes[i, j].bar(np.arange(len(PH)-1, -1, -1), PH, color = 'red', alpha = 0.7)
+            axes[i,j].set_ylim(-0, 1)
+            axes[i,j].set_xlim(-0.5,6.5)
+            axes[i,j].hlines(Atk_EV, -0.5, 6.5, color = 'r', linestyle = '--')
+        i = i + 1
+
+
+
+plt.show()
