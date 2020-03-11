@@ -10,4 +10,6 @@ Attackers and defenders may modify one or all of their rolled dice with re-rolls
 
 As of 7 Mar the sim accurately simulates attack rolls with or without re-rolls (target lock) and with or without modification (focus).
 
-visualizations to follow.
+![Attack Dice pdfs](/Figure_1.png)
+
+Moral of the story: Given the choice between Focus and Target Lock always choose Focus. If you can choose both, choose both.
