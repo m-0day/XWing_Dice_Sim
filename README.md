@@ -15,4 +15,8 @@ The sim accurately simulates attack rolls with or without re-rolls (target lock)
 
 Moral of the story: Given the choice between Focus and Target Lock always choose Focus because it can be used for defense as well. If you can choose both, always choose both target lock and focus.
 
+![Defense Dice pdfs](/Figure_2.png)
+
+And here we see that unsurprisingly evade tokens greatly increase the expected number of evades possible.
+
 There are other much more sophisticated dice simulators out there such as [X-Wing Dice Calculator](http://xwing.gateofstorms.net/2/multi/), but I wanted something to show to my 7 year old that would make sense to him.
