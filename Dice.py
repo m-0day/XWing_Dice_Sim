@@ -177,8 +177,6 @@ def Atk_P(M, focus = False, target_lock = False):
                     if (N == n[-1]):
                         PH_rr[0, M-success] = p_holder
             PH = PH_rr[:]
-
-
             
     Atk_EV = 0
     m = M
@@ -217,30 +215,58 @@ def find_PE_r(N, focus = False):
 def find_PE_f(M):
     m = 0
     PE = np.zeros((1,M+1))
-    hits = dict(list())
-    hit_counts = list()
-    fhit_counts = list()
-    for atk_combs in combinations_with_replacement(A_dice, M):
-        print("roll combos", atk_combs)
-        count_e = atk_combs.count('e') 
-        count_f = atk_combs.count('f')
-        count_b = atk_combs.count('b')
-        fct_e = atk_combs.count('e')+atk_combs.count('f')
-        fct_b = atk_combs.count('b')
-        hit_counts.append((count_e, count_f, count_b))
-        fhit_counts.append((fct_e, fct_b))
-    hit_counts = list(dict.fromkeys(hit_counts))
-    for i in range(len(hit_counts)):
-        items = np.sort(hit_counts[i][:])
+    evades = dict(list())
+    evade_counts = list()
+    fevade_counts = list()
+    for evade_combs in combinations_with_replacement(D_dice, M):
+        print("roll combos", evade_combs)
+        count_e = evade_combs.count('e') 
+        count_f = evade_combs.count('f')
+        count_b = evade_combs.count('b')
+        fct_e = evade_combs.count('e')+evade_combs.count('f')
+        fct_b = evade_combs.count('b')
+        evade_counts.append((count_e, count_f, count_b))
+        fevade_counts.append((fct_e, fct_b))
+    evade_counts = list(dict.fromkeys(evade_counts))
+    for i in range(len(evade_counts)):
+        items = np.sort(evade_counts[i][:])
         items = items[::-1]
         P_holder = nCr(M, items[0])*nCr(M-items[0], items[1])*nCr(m-items[0]-items[1], items[2])* \
-            (PHa**(hit_counts[i][0]))*(PFa**(hit_counts[i][1]))*(PBa**(hit_counts[i][2]))
-        if str(fhit_counts[i][0]) in hits.keys():
-            hits[str(fhit_counts[i][0])].append(P_holder)
+            (PEd**(evade_counts[i][0]))*(PFd**(evade_counts[i][1]))*(PBd**(evade_counts[i][2]))
+        if str(fevade_counts[i][0]) in evades.keys():
+            evades[str(fevade_counts[i][0])].append(P_holder)
         else:
-            hits[str(fhit_counts[i][0])]= [P_holder]
-    for key in hits.keys():
-        PE[0, M- int(key)] = sum(hits[key])
+            evades[str(fevade_counts[i][0])]= [P_holder]
+    for key in evades.keys():
+        PE[0, M- int(key)] = sum(evades[key])
+    return PE
+
+def find_PE_evade(N, focus = False, ev_cts = 0):
+    evade_counts = list()
+    PE = np.zeros((1,N+1))
+    n = 0
+    if focus == False:
+        for def_combs in combinations_with_replacement(D_dice, N):
+            print(def_combs)
+            count_e = def_combs.count('e')
+            count_f = def_combs.count('f')
+            count_b = def_combs.count('b')
+            evade_counts.append((count_e, count_f, count_b))
+        for i in range(len(evade_counts)):
+            items = np.sort(evade_counts[i][:])
+            items = items[::-1]
+            #n is number of successes - 
+            # if n <= ev_cts then n = ev_cts
+            k = min(N - ev_cts, N - evade_counts[i][0])
+            PE[0,k] = PE[0,k] + \
+                nCr(N, items[0])*nCr(N-items[0], items[1])*nCr(N-items[0]-items[1], items[2])* \
+                    (PEd**(evade_counts[i][0]))*(PFd**(evade_counts[i][1]))*(PBd**(evade_counts[i][2]))
+            if (i < len(evade_counts)-1):
+                if ((evade_counts[i+1][0]) < evade_counts[i][0]):
+                    n = n + 1
+        Def_EV = 0
+    for i in range(len(PE[0,:])-1, -1, -1):
+        Def_EV = PE[0,i]*(n-i) + Def_EV
     return PE
 
 #Calc nominal evade dice rolls
@@ -256,8 +282,12 @@ def Def_P(M, focus = False, num_evade = 0):
     if (focus == True):
         PE = find_PE_f(M)
 
+    # one for evade:
+    if num_evade > 0:
+        res_num_evade = min(M, num_evade)
+        PE = find_PE_evade(M, ev_cts=res_num_evade)
+
     # need one for focus AND evade
-    
 
     Def_EV = 0
     m = M
@@ -265,26 +295,63 @@ def Def_P(M, focus = False, num_evade = 0):
         Def_EV = PE[0,i]*(m-i) + Def_EV
     return PE[0,:], Def_EV
 
+#### plots for hits ####
+
+# fig, axes = plt.subplots(4, 5, sharey=True, sharex=True)
+# fig.suptitle('X-wing Attack Dice Probability Density Functions (pdf)')
+# axes[0,0].set_ylabel('Target Lock and Focus')
+# axes[1,0].set_ylabel('Focus')
+# axes[2,0].set_ylabel('Target Lock')
+# axes[3,0].set_ylabel('No dice mods')
+# axes.set_ylim(-0, 1)
+# axes.set_xlim(-0.5,6.5)
+# fig.text(0.35, 0.05, 'Number of Dice Rolled', va='center', rotation='horizontal')
+
+# i = 0
+# for f in (True, False):   
+#     for tl in (True, False):
+#         for M in range(1,6):
+#             j = M-1
+#             PH, Atk_EV = Atk_P(M, focus= f, target_lock= tl)
+#             print ('Number of red dice =', M, ', Focus = ', f, ', Target Lock = ', tl, '\n', 'PH = ', PH, '. Expected number of hits = ', Atk_EV)
+#             axes[i, j].bar(np.arange(len(PH)-1, -1, -1), PH, color = 'red', alpha = 0.7)
+#             s = "Exp. Hits = " + str(Atk_EV)
+#             axes[i,j].text(0.25, 0.85, s, color = 'black')
+#         i = i + 1
+
+# plt.show()
+
+#### plots for evades ####
+
 fig, axes = plt.subplots(4, 5, sharey=True, sharex=True)
-fig.suptitle('X-wing Attack Dice Probability Density Functions (pdf)')
-axes[0,0].set_ylabel('Target Lock and Focus')
-axes[1,0].set_ylabel('Focus')
-axes[2,0].set_ylabel('Target Lock')
+fig.suptitle('X-wing Defense Dice Probability Density Functions (pdf)')
+axes[0,0].set_ylabel('Two Evade Tokens')
+axes[1,0].set_ylabel('One Evade Token')
+axes[2,0].set_ylabel('Focus')
 axes[3,0].set_ylabel('No dice mods')
-axes.set_ylim(-0, 1)
-axes.set_xlim(-0.5,6.5)
+axes[0,0].set_ylim([0, 1])
+axes[0,0].set_xlim([-0.5,6.5])
 fig.text(0.35, 0.05, 'Number of Dice Rolled', va='center', rotation='horizontal')
 
 i = 0
+for ev in (range(2,1, -1)):
+    for M in range(1,6):
+        j = M-1
+        PE, Def_EV = Def_P(M, focus = False, num_evade = ev)
+        print ('Number of green dice =', M, ', Number of evades =', ev, '\n', 'PE = ', PE, '. Expected number of evades = ', Def_EV)
+        axes[i, j].bar(np.arange(len(PE)-1, -1, -1), PE, color = 'green', alpha = 0.7)
+        s = "Exp. Evades = " + str(Def_EV)
+        axes[i,j].text(0.25, 0.85, s, color = 'black')
+    i = i + 1
+
 for f in (True, False):   
-    for tl in (True, False):
-        for M in range(1,6):
-            j = M-1
-            PH, Atk_EV = Atk_P(M, focus= f, target_lock= tl)
-            print ('Number of red dice =', M, ', Focus = ', f, ', Target Lock = ', tl, '\n', 'PH = ', PH, '. Expected number of hits = ', Atk_EV)
-            axes[i, j].bar(np.arange(len(PH)-1, -1, -1), PH, color = 'red', alpha = 0.7)
-            s = "Exp. Hits = " + str(Atk_EV)
-            axes[i,j].text(0.25, 0.85, s, color = 'black')
-        i = i + 1
+    for M in range(1,6):
+        j = M-1
+        PE, Def_EV = Def_P(M, focus = f, num_evade = 0)
+        print ('Number of green dice =', M, ', Focus = ', f, '\n', 'PE = ', PE, '. Expected number of evades = ', Def_EV)
+        axes[i, j].bar(np.arange(len(PE)-1, -1, -1), PE, color = 'green', alpha = 0.7)
+        s = "Exp. Evades = " + str(Def_EV)
+        axes[i,j].text(0.25, 0.85, s, color = 'black')
+    i = i + 1
 
 plt.show()
