@@ -288,12 +288,62 @@ def Def_P(M, focus = False, num_evade = 0):
         PE = find_PE_evade(M, ev_cts=res_num_evade)
 
     # need one for focus AND evade
-
+    PE = PE.round(4)
     Def_EV = 0
     m = M
     for i in range(len(PE[0,:])-1, -1, -1):
         Def_EV = PE[0,i]*(m-i) + Def_EV
     return PE[0,:], Def_EV
+
+def P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_ev = 0):
+    # This function returns an M+1 length array containing the pdf of resolved hits in a
+    # given attack/def scenario.
+
+    # M = num of Attack dice
+    # N = num of Defense dice
+    # 
+    
+    Ph_resolved = np.zeros(M+1)
+ 
+    for m in range(M, -1, -1):
+        n = m
+        p_holder = 0
+        hits = range(m,-1,-1)
+        evades = range(n,-1,-1)
+
+        ph, atk_ev = Atk_P(M, focus = atk_f, target_lock = atk_tl)
+        pe, def_ev = Def_P(N, focus = def_f, num_evade = def_num_ev)
+        #need to check the length of pe
+        le = len(pe)
+        lh = len(ph)
+        if (le> len(ph)):
+            # p_e = p_e.flip()
+            p_e = pe[-1:lh-1:-1] #start from 0 evades (which is the end of the array) to whatever
+        elif (le == len(ph)):
+            p_e = pe[-1::-1]
+        else:
+            # p_e = p_e.flip()
+            p_e = pe[-1::-1]
+            p_e.extend(np.zeros(lh-le))
+
+        for h in hits:
+            
+                #fill in the remainder of pe with zeros
+                # for length of different ways to get h hits:
+                #for M = 3, h = 3 there's one way
+                #for M = 2, h = 2 there's two ways (3 hits, 1 evade + 2 hits, 0 evade)
+            p_holder = 0
+            for i in range(M, h-1, -1):
+                p_holder = ph[M-i]*(p_e[M-i]) + p_holder
+            Ph_resolved[M-h] = p_holder
+
+
+    
+    return Ph_resolved
+M = 3
+N = 3
+P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_ev = 0)
+
 
 #### plots for hits ####
 
@@ -323,35 +373,44 @@ def Def_P(M, focus = False, num_evade = 0):
 
 #### plots for evades ####
 
-fig, axes = plt.subplots(4, 5, sharey=True, sharex=True)
-fig.suptitle('X-wing Defense Dice Probability Density Functions (pdf)')
-axes[0,0].set_ylabel('Two Evade Tokens')
-axes[1,0].set_ylabel('One Evade Token')
-axes[2,0].set_ylabel('Focus')
-axes[3,0].set_ylabel('No dice mods')
-axes[0,0].set_ylim([0, 1])
-axes[0,0].set_xlim([-0.5,6.5])
-fig.text(0.35, 0.05, 'Number of Dice Rolled', va='center', rotation='horizontal')
+# fig, axes = plt.subplots(4, 5, sharey=True, sharex=True)
+# fig.suptitle('X-wing Defense Dice Probability Density Functions (pdf)')
+# axes[0,0].set_ylabel('Two Evade Tokens')
+# axes[1,0].set_ylabel('One Evade Token')
+# axes[2,0].set_ylabel('Focus')
+# axes[3,0].set_ylabel('No dice mods')
+# axes[0,0].set_ylim([0, 1])
+# axes[0,0].set_xlim([-0.5,6.5])
+# fig.text(0.35, 0.05, 'Number of Dice Rolled', va='center', rotation='horizontal')
 
-i = 0
-for ev in (range(2,0, -1)):
-    for M in range(1,6):
-        j = M-1
-        PE, Def_EV = Def_P(M, focus = False, num_evade = ev)
-        print ('Number of green dice =', M, ', Number of evades =', ev, '\n', 'PE = ', PE, '. Expected number of evades = ', Def_EV)
-        axes[i, j].bar(np.arange(len(PE)-1, -1, -1), PE, color = 'green', alpha = 0.7)
-        s = "Exp. Evades = " + str(Def_EV)
-        axes[i,j].text(0.25, 0.85, s, color = 'black')
-    i = i + 1
+# i = 0
+# for ev in (range(2,0, -1)):
+#     for M in range(1,6):
+#         j = M-1
+#         PE, Def_EV = Def_P(M, focus = False, num_evade = ev)
+#         print ('Number of green dice =', M, ', Number of evades =', ev, '\n', 'PE = ', PE, '. Expected number of evades = ', Def_EV)
+#         axes[i, j].bar(np.arange(len(PE)-1, -1, -1), PE, color = 'green', alpha = 0.7)
+#         s = "Exp. Evades = " + str(Def_EV)
+#         axes[i,j].text(0.25, 0.85, s, color = 'black')
+#     i = i + 1
 
-for f in (True, False):   
-    for M in range(1,6):
-        j = M-1
-        PE, Def_EV = Def_P(M, focus = f, num_evade = 0)
-        print ('Number of green dice =', M, ', Focus = ', f, '\n', 'PE = ', PE, '. Expected number of evades = ', Def_EV)
-        axes[i, j].bar(np.arange(len(PE)-1, -1, -1), PE, color = 'green', alpha = 0.7)
-        s = "Exp. Evades = " + str(Def_EV)
-        axes[i,j].text(0.25, 0.85, s, color = 'black')
-    i = i + 1
+# for f in (True, False):   
+#     for M in range(1,6):
+#         j = M-1
+#         PE, Def_EV = Def_P(M, focus = f, num_evade = 0)
+#         print ('Number of green dice =', M, ', Focus = ', f, '\n', 'PE = ', PE, '. Expected number of evades = ', Def_EV)
+#         axes[i, j].bar(np.arange(len(PE)-1, -1, -1), PE, color = 'green', alpha = 0.7)
+#         s = "Exp. Evades = " + str(Def_EV)
+#         axes[i,j].text(0.25, 0.85, s, color = 'black')
+#     i = i + 1
 
-plt.show()
+# plt.show()
+
+#### calculate and plot expected number of hits in a shootout ####
+#
+# several sheets of a grid of subplots of rows and columns
+# each grid column is number of defense dice rolled: 1-6, each row is defender's token:
+# 2 evades, 1 evade, 1 focus, or no mods
+# there are 6 sheets, each one for the number of attack dice rolled in increasing number from 1-6
+
+# 
