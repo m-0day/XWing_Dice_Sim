@@ -17,6 +17,6 @@ Moral of the story: Given the choice between Focus and Target Lock always choose
 
 ![Defense Dice pdfs](/Figure_2.png)
 
-And here we see that unsurprisingly evade tokens greatly increase the expected number of evades possible.
+And here we see a surprising result that one evade token is INFERIOR to one focus token for increasing the expected number of evades for all cases except when rolling one die.
 
 There are other much more sophisticated dice simulators out there such as [X-Wing Dice Calculator](http://xwing.gateofstorms.net/2/multi/), but I wanted something to show to my 7 year old that would make sense to him.
