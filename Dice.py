@@ -334,7 +334,7 @@ axes[0,0].set_xlim([-0.5,6.5])
 fig.text(0.35, 0.05, 'Number of Dice Rolled', va='center', rotation='horizontal')
 
 i = 0
-for ev in (range(2,1, -1)):
+for ev in (range(2,0, -1)):
     for M in range(1,6):
         j = M-1
         PE, Def_EV = Def_P(M, focus = False, num_evade = ev)
