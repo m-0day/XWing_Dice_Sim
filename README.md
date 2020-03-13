@@ -5,9 +5,9 @@ This accurately simulates the vast combinations of modified dice rolls in the po
 
 ## But Why Do This? Are you insane?
 
-Only moderately. But this is a fun game and I play it with my 7 year old. He has a built-in sense of probabilities but this is the perfect opportunity to teach him about probability theory. 
+Only moderately. But A) this is a fun game that I play it with my 7 year old so-- bonding. He has a built-in sense of probabilities but this is the perfect opportunity to teach him about probability theory. And B) Let's be honest I would probably wind up doing this anyway.
 
-And the dice rolling in this game is FULL of probability theory.
+And the dice rolling in this game is FULL of probability theory to teach :)
 
 To get an idea how obfuscated the probabilities of certain encounters can get consider this.
 An attacker and defender roll dice, one after the other.
@@ -21,7 +21,7 @@ To further drive the point home, let's ask ourselves, if I roll 3 red dice and m
 
 Great, so now what are my odds ("never tell me the odds") of rolling 2 hits with 3 dice? Let's see.
 
-![Hits math](/hits pdf.jpg)
+![Hits math](/hits_pdf.jpg)
 
 Well that is a bear. Good thing we have python to do all the heavy lifting for us.
 
