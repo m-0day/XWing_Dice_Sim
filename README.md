@@ -41,3 +41,14 @@ And here we see a surprising result that one evade token is INFERIOR to one focu
 
 ###
 There are other much more sophisticated dice simulators out there such as [X-Wing Dice Calculator](http://xwing.gateofstorms.net/2/multi/), but I wanted something to show to my 7 year old that would make sense to him in a visual way.
+
+## How many hits will I score?
+If you have M attack dice and your opponent has N defense dice how many hits will you score on him?
+
+Below is the example of M = 1 to 3 attack dice and N = 1 to 3 defense dice, without modifications. So if you rolled one attack die your opponent rolled 1 defense die and so on.
+
+![Resolved Hits](/Figure_3.png)
+
+I'm working on this for the moment. Eventually I will show M = 1 to 6 attack dice, unmodified, target lock, focus, and target lock + focus against N = 1 to 6 defense dice, unmodified, focus, and 1 evade.
+
+So quick math that will be 6x6x4x3 plots or 432 plots. yikes, 24 pages of subplots.
