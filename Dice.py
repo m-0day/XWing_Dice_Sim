@@ -30,7 +30,7 @@ def find_PH_r(M):
     PH = np.zeros((1,M+1))
     m = 0
     for atk_combs in combinations_with_replacement(A_dice, M):
-        print(atk_combs)
+        # print(atk_combs)
         count_h = atk_combs.count('h')
         count_f = atk_combs.count('f')
         count_b = atk_combs.count('b')
@@ -56,7 +56,7 @@ def find_PH_f(M):
     hit_counts = list()
     fhit_counts = list()
     for atk_combs in combinations_with_replacement(A_dice, M):
-        print("roll combos", atk_combs)
+        # print("roll combos", atk_combs)
         count_h = atk_combs.count('h') 
         count_f = atk_combs.count('f')
         count_b = atk_combs.count('b')
@@ -182,6 +182,7 @@ def Atk_P(M, focus = False, target_lock = False):
     m = M
     for i in range(len(PH[0,:])-1, -1, -1):
         Atk_EV = PH[0,i]*(m-i) + Atk_EV
+    Atk_EV = round(Atk_EV, 4)
     return PH[0,:], Atk_EV
 
 
@@ -193,7 +194,7 @@ def find_PE_r(N, focus = False):
     n = 0
     if focus == False:
         for def_combs in combinations_with_replacement(D_dice, N):
-            print(def_combs)
+            # print(def_combs)
             count_e = def_combs.count('e')
             count_f = def_combs.count('f')
             count_b = def_combs.count('b')
@@ -219,7 +220,7 @@ def find_PE_f(M):
     evade_counts = list()
     fevade_counts = list()
     for evade_combs in combinations_with_replacement(D_dice, M):
-        print("roll combos", evade_combs)
+        # print("roll combos", evade_combs)
         count_e = evade_combs.count('e') 
         count_f = evade_combs.count('f')
         count_b = evade_combs.count('b')
@@ -247,7 +248,7 @@ def find_PE_evade(N, focus = False, ev_cts = 0):
     n = 0
     if focus == False:
         for def_combs in combinations_with_replacement(D_dice, N):
-            print(def_combs)
+            # print(def_combs)
             count_e = def_combs.count('e')
             count_f = def_combs.count('f')
             count_b = def_combs.count('b')
@@ -288,7 +289,7 @@ def Def_P(M, focus = False, num_evade = 0):
         PE = find_PE_evade(M, ev_cts=res_num_evade)
 
     # need one for focus AND evade
-    PE = PE.round(4)
+    # PE = PE.round(4)
     Def_EV = 0
     m = M
     for i in range(len(PE[0,:])-1, -1, -1):
@@ -304,58 +305,76 @@ def P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_
     # N = num of Defense dice
     # 
     
-    Ph_resolved = np.zeros(M+1)
+    
  
     for m in range(M, -1, -1):
+        Ph_resolved = np.zeros(m+1)
         n = m
         p_holder = 0
         hits = range(m,-1,-1)
         evades = range(n,-1,-1)
 
-        ph, atk_ev = Atk_P(M, focus = atk_f, target_lock = atk_tl)
-        pe, def_ev = Def_P(N, focus = def_f, num_evade = def_num_ev)
+        ph, atk_ev = Atk_P(m, focus = atk_f, target_lock = atk_tl)
+        pe, def_ev = Def_P(n, focus = def_f, num_evade = def_num_ev)
+        print('ph = ', ph)
+        print('pe = ', pe)
         #need to check the length of pe
         le = len(pe)
         lh = len(ph)
-        if (le> len(ph)):
+        # if (le> len(ph)):
             # p_e = p_e.flip()
-            p_e = pe[-1:lh-1:-1] #start from 0 evades (which is the end of the array) to whatever
-        elif (le == len(ph)):
-            p_e = pe[-1::-1]
-        else:
-            # p_e = p_e.flip()
-            p_e = pe[-1::-1]
-            p_e.extend(np.zeros(lh-le))
+        #     p_e = pe[-1:lh-1:-1] #start from 0 evades (which is the end of the array) to whatever
+        # elif (le == len(ph)):
+        #     p_e = pe[-1::-1]
+        # else:
+        #     p_e = p_e.flip()
+        #     # p_e = pe[-1::-1]
+        #     p_e.extend(np.zeros(lh-le))
 
         for h in hits:
-            
-                #fill in the remainder of pe with zeros
-                # for length of different ways to get h hits:
-                #for M = 3, h = 3 there's one way
-                #for M = 2, h = 2 there's two ways (3 hits, 1 evade + 2 hits, 0 evade)
-
                 #   M = N = 3
                 #   P(h = 3) = P(h = 3)P(e = 0)
                 #   P(h = 2) = P(h = 3)P(e = 1) + P(h = 2)P(e = 0)
                 #   P(h = 1) = P(h = 3)P(e = 2) + P(h = 2)P(e = 1) + P(h = 1)P(e = 0)
-                #   P(h = 0) = P(h = 3)P(e = 3) + P(h = 2)P(e = 2) + P(h = 1)P(e = 1) + P(h = 0)*1
-
-
-            print('hits = ', h, ". num attack dice =", M, ". num def dice = ", N)
+                #   P(h = 0) = P(h = 3)P(e >= 3) + P(h = 2)P(e >= 2) + P(h = 1)P(e >= 1) + P(h = 0)P(e >= 0)
+           
+                #   M = N = 3
+                #   P(h = 3) = ph[0]*pe[3]
+                #   P(h = 2) = ph[0]*pe[2] + ph[1]*pe[3]
+                #   P(h = 1) = ph[0]*pe[1] + ph[1]*pe[2] + ph[2]*pe[3]
+                #   P(h = 0) = P(h = 3)P(e >= 3) + P(h = 2)P(e >= 2) + P(h = 1)P(e >= 1) + P(h = 0)P(e >= 0)
+           
+            print('hits = ', h, ". num attack dice =", m, ". num def dice = ", n)
             p_holder = 0
-            for i in range(M, h-1, -1):
-                if (h != 0):
-                    p_holder = ph[M-i]*(p_e[M-i]) + p_holder
-                elif (h == 0):
-                    p_holder = ph[-1] + p_holder
-            Ph_resolved[M-h] = p_holder
-            print('prob of ', h, 'resolved hits = ', Ph_resolved[M-h])
-
+            #evade array is in order N to 0 evades, so 0 evades is the last elem.
+            #go from M-h away from the end to the end
+            if (h != 0):
+                for i, j in zip(range(m, h-1, -1), range(n, h-1, -1)):
+                    # print('i = ', i, 'j = ', j)
+                    print('ph elem = ', m-i, 'pe elem = ', j)
+                    p_holder = ph[m-i]*(pe[j]) + p_holder
+                    #I think this part is good, not sure about below.
+            if (h == 0):
+                for i in range(m, h-1, -1):
+                    print('ph elem = ', m-i)
+                    pe_holder = 0
+                    for k in range(m, i-1, -1):
+                        print('pe elem = ', m-k)
+                        pe_holder = pe[m-k] + pe_holder
+                    p_holder = ph[m-i]*(pe_holder) + p_holder
+            Ph_resolved[m-h] = p_holder
+            print('prob of ', h, 'resolved hits = ', Ph_resolved[m-h])
+        print('Ph_resolved sum = ', Ph_resolved.sum())
 
     
     return Ph_resolved
-M = 3
-N = 3
+M = 4
+N = 4
+
+
+# for i, j in zip(range(M), range(N, -1, -1)):
+#     print('i = ', i, 'j = ', j)
+
 Ph_resolved = P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_ev = 0)
 
 
