@@ -293,6 +293,7 @@ def Def_P(M, focus = False, num_evade = 0):
     m = M
     for i in range(len(PE[0,:])-1, -1, -1):
         Def_EV = PE[0,i]*(m-i) + Def_EV
+    Def_EV = Def_EV.round(4)
     return PE[0,:], Def_EV
 
 def P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_ev = 0):
@@ -332,17 +333,30 @@ def P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_
                 # for length of different ways to get h hits:
                 #for M = 3, h = 3 there's one way
                 #for M = 2, h = 2 there's two ways (3 hits, 1 evade + 2 hits, 0 evade)
+
+                #   M = N = 3
+                #   P(h = 3) = P(h = 3)P(e = 0)
+                #   P(h = 2) = P(h = 3)P(e = 1) + P(h = 2)P(e = 0)
+                #   P(h = 1) = P(h = 3)P(e = 2) + P(h = 2)P(e = 1) + P(h = 1)P(e = 0)
+                #   P(h = 0) = P(h = 3)P(e = 3) + P(h = 2)P(e = 2) + P(h = 1)P(e = 1) + P(h = 0)*1
+
+
+            print('hits = ', h, ". num attack dice =", M, ". num def dice = ", N)
             p_holder = 0
             for i in range(M, h-1, -1):
-                p_holder = ph[M-i]*(p_e[M-i]) + p_holder
+                if (h != 0):
+                    p_holder = ph[M-i]*(p_e[M-i]) + p_holder
+                elif (h == 0):
+                    p_holder = ph[-1] + p_holder
             Ph_resolved[M-h] = p_holder
+            print('prob of ', h, 'resolved hits = ', Ph_resolved[M-h])
 
 
     
     return Ph_resolved
 M = 3
 N = 3
-P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_ev = 0)
+Ph_resolved = P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_ev = 0)
 
 
 #### plots for hits ####
@@ -371,7 +385,7 @@ P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_ev =
 
 # plt.show()
 
-#### plots for evades ####
+### plots for evades ####
 
 # fig, axes = plt.subplots(4, 5, sharey=True, sharex=True)
 # fig.suptitle('X-wing Defense Dice Probability Density Functions (pdf)')
