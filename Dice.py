@@ -300,82 +300,60 @@ def Def_P(M, focus = False, num_evade = 0):
 def P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_ev = 0):
     # This function returns an M+1 length array containing the pdf of resolved hits in a
     # given attack/def scenario.
-
+    m = M
+    n = m
     # M = num of Attack dice
     # N = num of Defense dice
-    # 
-    
-    
- 
-    for m in range(M, -1, -1):
-        Ph_resolved = np.zeros(m+1)
-        n = m
+
+    Ph_resolved = np.zeros(m+1)
+    n = m
+    p_holder = 0
+    hits = range(m,-1,-1)
+    evades = range(n,-1,-1)
+
+    ph, atk_ev = Atk_P(m, focus = atk_f, target_lock = atk_tl)
+    pe, def_ev = Def_P(n, focus = def_f, num_evade = def_num_ev)
+    print('ph = ', ph)
+    print('pe = ', pe)
+    for h in hits:
+            # Example #
+            #   M = N = 3
+            #   P(h = 3) = ph[0]*pe[3]
+            #   P(h = 2) = ph[0]*pe[2] + ph[1]*pe[3]
+            #   P(h = 1) = ph[0]*pe[1] + ph[1]*pe[2] + ph[2]*pe[3]
+            #   P(h = 0) = P(h = 3)P(e >= 3) + P(h = 2)P(e >= 2) + P(h = 1)P(e >= 1) + P(h = 0)P(e >= 0)
+        
+        print('hits = ', h, ". num attack dice =", m, ". num def dice = ", n)
         p_holder = 0
-        hits = range(m,-1,-1)
-        evades = range(n,-1,-1)
+        #evade array is in order N to 0 evades, so 0 evades is the last elem.
+        #go from M-h away from the end to the end
+        if (h != 0):
+            for i, j in zip(range(m, h-1, -1), range(n, h-1, -1)):
+                # print('i = ', i, 'j = ', j)
+                print('ph elem = ', m-i, 'pe elem = ', j)
+                p_holder = ph[m-i]*(pe[j]) + p_holder
+                #I think this part is good, not sure about below.
+        if (h == 0):
+            for i in range(m, h-1, -1):
+                print('ph elem = ', m-i)
+                pe_holder = 0
+                for k in range(m, i-1, -1):
+                    print('pe elem = ', m-k)
+                    pe_holder = pe[m-k] + pe_holder
+                p_holder = ph[m-i]*(pe_holder) + p_holder
+        Ph_resolved[m-h] = p_holder
+        print('prob of ', h, 'resolved hits = ', Ph_resolved[m-h])
+    print('Ph_resolved sum = ', Ph_resolved.sum())
 
-        ph, atk_ev = Atk_P(m, focus = atk_f, target_lock = atk_tl)
-        pe, def_ev = Def_P(n, focus = def_f, num_evade = def_num_ev)
-        print('ph = ', ph)
-        print('pe = ', pe)
-        #need to check the length of pe
-        le = len(pe)
-        lh = len(ph)
-        # if (le> len(ph)):
-            # p_e = p_e.flip()
-        #     p_e = pe[-1:lh-1:-1] #start from 0 evades (which is the end of the array) to whatever
-        # elif (le == len(ph)):
-        #     p_e = pe[-1::-1]
-        # else:
-        #     p_e = p_e.flip()
-        #     # p_e = pe[-1::-1]
-        #     p_e.extend(np.zeros(lh-le))
+    EV_resolved = 0
+    for i in range(len(Ph_resolved)-1, -1, -1):
+        EV_resolved = Ph_resolved[i]*(m-i) + EV_resolved
+    EV_resolved = round(EV_resolved, 4)
 
-        for h in hits:
-                #   M = N = 3
-                #   P(h = 3) = P(h = 3)P(e = 0)
-                #   P(h = 2) = P(h = 3)P(e = 1) + P(h = 2)P(e = 0)
-                #   P(h = 1) = P(h = 3)P(e = 2) + P(h = 2)P(e = 1) + P(h = 1)P(e = 0)
-                #   P(h = 0) = P(h = 3)P(e >= 3) + P(h = 2)P(e >= 2) + P(h = 1)P(e >= 1) + P(h = 0)P(e >= 0)
-           
-                #   M = N = 3
-                #   P(h = 3) = ph[0]*pe[3]
-                #   P(h = 2) = ph[0]*pe[2] + ph[1]*pe[3]
-                #   P(h = 1) = ph[0]*pe[1] + ph[1]*pe[2] + ph[2]*pe[3]
-                #   P(h = 0) = P(h = 3)P(e >= 3) + P(h = 2)P(e >= 2) + P(h = 1)P(e >= 1) + P(h = 0)P(e >= 0)
-           
-            print('hits = ', h, ". num attack dice =", m, ". num def dice = ", n)
-            p_holder = 0
-            #evade array is in order N to 0 evades, so 0 evades is the last elem.
-            #go from M-h away from the end to the end
-            if (h != 0):
-                for i, j in zip(range(m, h-1, -1), range(n, h-1, -1)):
-                    # print('i = ', i, 'j = ', j)
-                    print('ph elem = ', m-i, 'pe elem = ', j)
-                    p_holder = ph[m-i]*(pe[j]) + p_holder
-                    #I think this part is good, not sure about below.
-            if (h == 0):
-                for i in range(m, h-1, -1):
-                    print('ph elem = ', m-i)
-                    pe_holder = 0
-                    for k in range(m, i-1, -1):
-                        print('pe elem = ', m-k)
-                        pe_holder = pe[m-k] + pe_holder
-                    p_holder = ph[m-i]*(pe_holder) + p_holder
-            Ph_resolved[m-h] = p_holder
-            print('prob of ', h, 'resolved hits = ', Ph_resolved[m-h])
-        print('Ph_resolved sum = ', Ph_resolved.sum())
+    return Ph_resolved, EV_resolved
 
-    
-    return Ph_resolved
 M = 4
 N = 4
-
-
-# for i, j in zip(range(M), range(N, -1, -1)):
-#     print('i = ', i, 'j = ', j)
-
-Ph_resolved = P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_ev = 0)
 
 
 #### plots for hits ####
@@ -446,4 +424,24 @@ Ph_resolved = P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False
 # 2 evades, 1 evade, 1 focus, or no mods
 # there are 6 sheets, each one for the number of attack dice rolled in increasing number from 1-6
 
-# 
+
+fig, axes = plt.subplots(1, 3, sharey=True, sharex=True) #just do 3 dice right now
+fig.suptitle('X-wing Shootout Resolved hits probability')
+axes[0].set_ylabel('No dice mods')
+# axes[1,0].set_ylabel('One Evade Token')
+# axes[2,0].set_ylabel('Focus')
+# axes[3,0].set_ylabel('No dice mods')
+axes[0].set_ylim([0, 1])
+axes[0].set_xlim([-0.5,3.5])
+fig.text(0.35, 0.03, 'Number of Dice Rolled', va='center', rotation='horizontal')
+
+M = 3
+N = 3
+for m in range(M):
+    Ph_resolved, EV_resolved = P_resolved_hits(m+1, m+1, atk_f = False, atk_tl = False, def_f = False, def_num_ev = 0)
+    #print out resolved hits
+    axes[m].bar(np.arange(len(Ph_resolved)-1, -1, -1), Ph_resolved, color = 'red', alpha = 0.7)
+    s = "Exp. Hits = " + str(EV_resolved)
+    axes[m].text(0.25, 0.85, s, color = 'black')
+
+plt.show()
