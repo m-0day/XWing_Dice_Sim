@@ -323,12 +323,12 @@ def P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_
             #   P(h = 1) = ph[0]*pe[1] + ph[1]*pe[2] + ph[2]*pe[3]
             #   P(h = 0) = P(h = 3)P(e >= 3) + P(h = 2)P(e >= 2) + P(h = 1)P(e >= 1) + P(h = 0)P(e >= 0)
         
-        print('hits = ', h, ". num attack dice =", m, ". num def dice = ", n)
+        print("### num attack dice =", m, ". num def dice = ", n, 'hits = ', h, )
         p_holder = 0
         #evade array is in order N to 0 evades, so 0 evades is the last elem.
         #go from M-h away from the end to the end
         if (h != 0):
-            for i, j in zip(range(m, h-1, -1), range(n, h-1, -1)):
+            for i, j in zip(range(m, h-1, -1), range(h, n+1)):
                 # print('i = ', i, 'j = ', j)
                 print('ph elem = ', m-i, 'pe elem = ', j)
                 p_holder = ph[m-i]*(pe[j]) + p_holder
