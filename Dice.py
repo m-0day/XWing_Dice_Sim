@@ -6,6 +6,7 @@ import operator as op
 from functools import reduce
 from _collections import defaultdict
 import matplotlib.pyplot as plt 
+from matplotlib.ticker import MaxNLocator
 
 PHa = 0.5
 PFa = 0.25
@@ -352,70 +353,87 @@ def P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_
 
     return Ph_resolved, EV_resolved
 
-M = 4
-N = 4
+### plots for hits ####
+M = 5
+N = 5
 
+fig, axes = plt.subplots(4, M, sharey=True, sharex=True)
+fig.suptitle('X-wing Attack Dice Probability Density Functions (pdf)')
+axes[0,0].set_ylabel('Target Lock and Focus')
+axes[1,0].set_ylabel('Focus')
+axes[2,0].set_ylabel('Target Lock')
+axes[3,0].set_ylabel('No dice mods')
+axes[3,0].set_xlabel('One Die Rolled')
+axes[3,1].set_xlabel('Two Dice')
+axes[3,2].set_xlabel('Three Dice')
+axes[3,3].set_xlabel('Four Dice')
+axes[3,4].set_xlabel('Five Dice')
+axes[0,0].set_ylim([0, 1])
+axes[0,0].set_xlim([-0.5,6.5])
+axes[0,0].xaxis.set_major_locator(MaxNLocator(integer=True))
+fig.text(0.35, 0.05, 'Number of Hits Rolled', va='center', rotation='horizontal')
 
-#### plots for hits ####
+i = 0
+for f in (True, False):   
+    for tl in (True, False):
+        for M in range(1,6):
+            j = M-1
+            PH, Atk_EV = Atk_P(M, focus= f, target_lock= tl)
+            print ('Number of red dice =', M, ', Focus = ', f, ', Target Lock = ', tl, '\n', 'PH = ', PH, '. Expected number of hits = ', Atk_EV)
+            axes[i, j].bar(np.arange(len(PH)-1, -1, -1), PH, color = 'red', alpha = 0.7)
+            s = "Exp. Hits = " + str(Atk_EV)
+            axes[i,j].text(0.25, 0.85, s, color = 'black')
+        i = i + 1
 
-# fig, axes = plt.subplots(4, 5, sharey=True, sharex=True)
-# fig.suptitle('X-wing Attack Dice Probability Density Functions (pdf)')
-# axes[0,0].set_ylabel('Target Lock and Focus')
-# axes[1,0].set_ylabel('Focus')
-# axes[2,0].set_ylabel('Target Lock')
-# axes[3,0].set_ylabel('No dice mods')
-# axes.set_ylim(-0, 1)
-# axes.set_xlim(-0.5,6.5)
-# fig.text(0.35, 0.05, 'Number of Dice Rolled', va='center', rotation='horizontal')
+plt.show()
 
-# i = 0
-# for f in (True, False):   
-#     for tl in (True, False):
-#         for M in range(1,6):
-#             j = M-1
-#             PH, Atk_EV = Atk_P(M, focus= f, target_lock= tl)
-#             print ('Number of red dice =', M, ', Focus = ', f, ', Target Lock = ', tl, '\n', 'PH = ', PH, '. Expected number of hits = ', Atk_EV)
-#             axes[i, j].bar(np.arange(len(PH)-1, -1, -1), PH, color = 'red', alpha = 0.7)
-#             s = "Exp. Hits = " + str(Atk_EV)
-#             axes[i,j].text(0.25, 0.85, s, color = 'black')
-#         i = i + 1
+## plots for evades ####
 
-# plt.show()
+fig, axes = plt.subplots(4, 5, sharey=True, sharex=True)
+fig.suptitle('X-wing Defense Dice Probability Density Functions (pdf)')
+axes[0,0].set_ylabel('Two Evade Tokens')
+axes[1,0].set_ylabel('One Evade Token')
+axes[2,0].set_ylabel('Focus')
+axes[3,0].set_ylabel('No dice mods')
+axes[0,0].set_ylim([0, 1])
+axes[0,0].set_xlim([-0.5,6.5])
+fig.text(0.35, 0.05, 'Number of Dice Rolled', va='center', rotation='horizontal')
 
-### plots for evades ####
+i = 0
+for ev in (range(2,0, -1)):
+    for M in range(1,6):
+        j = M-1
+        PE, Def_EV = Def_P(M, focus = False, num_evade = ev)
+        print ('Number of green dice =', M, ', Number of evades =', ev, '\n', 'PE = ', PE, '. Expected number of evades = ', Def_EV)
+        axes[i, j].bar(np.arange(len(PE)-1, -1, -1), PE, color = 'green', alpha = 0.7)
+        s = "Exp. Evades = " + str(Def_EV)
+        axes[i,j].text(0.25, 0.85, s, color = 'black')
+    i = i + 1
 
-# fig, axes = plt.subplots(4, 5, sharey=True, sharex=True)
-# fig.suptitle('X-wing Defense Dice Probability Density Functions (pdf)')
-# axes[0,0].set_ylabel('Two Evade Tokens')
-# axes[1,0].set_ylabel('One Evade Token')
-# axes[2,0].set_ylabel('Focus')
-# axes[3,0].set_ylabel('No dice mods')
-# axes[0,0].set_ylim([0, 1])
-# axes[0,0].set_xlim([-0.5,6.5])
-# fig.text(0.35, 0.05, 'Number of Dice Rolled', va='center', rotation='horizontal')
+for f in (True, False):   
+    for M in range(1,6):
+        j = M-1
+        PE, Def_EV = Def_P(M, focus = f, num_evade = 0)
+        print ('Number of green dice =', M, ', Focus = ', f, '\n', 'PE = ', PE, '. Expected number of evades = ', Def_EV)
+        axes[i, j].bar(np.arange(len(PE)-1, -1, -1), PE, color = 'green', alpha = 0.7)
+        s = "Exp. Evades = " + str(Def_EV)
+        axes[i,j].text(0.25, 0.85, s, color = 'black')
+    i = i + 1
 
-# i = 0
-# for ev in (range(2,0, -1)):
-#     for M in range(1,6):
-#         j = M-1
-#         PE, Def_EV = Def_P(M, focus = False, num_evade = ev)
-#         print ('Number of green dice =', M, ', Number of evades =', ev, '\n', 'PE = ', PE, '. Expected number of evades = ', Def_EV)
-#         axes[i, j].bar(np.arange(len(PE)-1, -1, -1), PE, color = 'green', alpha = 0.7)
-#         s = "Exp. Evades = " + str(Def_EV)
-#         axes[i,j].text(0.25, 0.85, s, color = 'black')
-#     i = i + 1
+plt.show()
+df = pd.DataFrame(columns = ['num_atk_dice', 'num_def_dice', 'atk_tl', 'atk_f', \
+    'def_f', 'def_num_ev']) 
+#### create dataframe for plotly plotting ####
+for n in range(N):
+    for ne in range(2):
+        for d_f in (True, False):
+            for m in range(M):
+                for af in (True, False):
+                    for at in (True, False):
+                        print('M=', m, ".  Atk_TL=", at, ".  Atk_f=", af, "\n", \
+                            "N=", n, ".  Def_f=", d_f, ".  Def_num_evs=",ne)
+                        Ph_resolved, EV_resolved = P_resolved_hits(m+1, m+1, atk_f = False, atk_tl = False, def_f = False, def_num_ev = 0)
 
-# for f in (True, False):   
-#     for M in range(1,6):
-#         j = M-1
-#         PE, Def_EV = Def_P(M, focus = f, num_evade = 0)
-#         print ('Number of green dice =', M, ', Focus = ', f, '\n', 'PE = ', PE, '. Expected number of evades = ', Def_EV)
-#         axes[i, j].bar(np.arange(len(PE)-1, -1, -1), PE, color = 'green', alpha = 0.7)
-#         s = "Exp. Evades = " + str(Def_EV)
-#         axes[i,j].text(0.25, 0.85, s, color = 'black')
-#     i = i + 1
-
-# plt.show()
 
 #### calculate and plot expected number of hits in a shootout ####
 #
@@ -425,23 +443,23 @@ N = 4
 # there are 6 sheets, each one for the number of attack dice rolled in increasing number from 1-6
 
 
-fig, axes = plt.subplots(1, 3, sharey=True, sharex=True) #just do 3 dice right now
-fig.suptitle('X-wing Shootout Resolved hits probability')
-axes[0].set_ylabel('No dice mods')
-# axes[1,0].set_ylabel('One Evade Token')
-# axes[2,0].set_ylabel('Focus')
-# axes[3,0].set_ylabel('No dice mods')
-axes[0].set_ylim([0, 1])
-axes[0].set_xlim([-0.5,3.5])
-fig.text(0.35, 0.03, 'Number of Dice Rolled', va='center', rotation='horizontal')
+# fig, axes = plt.subplots(1, 3, sharey=True, sharex=True) #just do 3 dice right now
+# fig.suptitle('X-wing Shootout Resolved hits probability')
+# axes[0].set_ylabel('No dice mods')
+# # axes[1,0].set_ylabel('One Evade Token')
+# # axes[2,0].set_ylabel('Focus')
+# # axes[3,0].set_ylabel('No dice mods')
+# axes[0].set_ylim([0, 1])
+# axes[0].set_xlim([-0.5,3.5])
+# fig.text(0.35, 0.03, 'Number of Dice Rolled', va='center', rotation='horizontal')
 
-M = 3
-N = 3
-for m in range(M):
-    Ph_resolved, EV_resolved = P_resolved_hits(m+1, m+1, atk_f = False, atk_tl = False, def_f = False, def_num_ev = 0)
-    #print out resolved hits
-    axes[m].bar(np.arange(len(Ph_resolved)-1, -1, -1), Ph_resolved, color = 'red', alpha = 0.7)
-    s = "Exp. Hits = " + str(EV_resolved)
-    axes[m].text(0.25, 0.85, s, color = 'black')
+# M = 3
+# N = 3
+# for m in range(M):
+#     Ph_resolved, EV_resolved = P_resolved_hits(m+1, m+1, atk_f = False, atk_tl = False, def_f = False, def_num_ev = 0)
+#     #print out resolved hits
+#     axes[m].bar(np.arange(len(Ph_resolved)-1, -1, -1), Ph_resolved, color = 'red', alpha = 0.7)
+#     s = "Exp. Hits = " + str(EV_resolved)
+#     axes[m].text(0.25, 0.85, s, color = 'black')
 
-plt.show()
+# plt.show()
