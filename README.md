@@ -5,9 +5,9 @@ This accurately simulates the vast combinations of modified dice rolls in the po
 
 ## But Why Do This? Are you insane?
 
-Only moderately. But A) this is a fun game that I play it with my 7 year old so-- bonding. He has a built-in sense of probabilities but this is the perfect opportunity to teach him about probability theory. And B) Let's be honest I would probably wind up doing this anyway.
+Only moderately. But A) this is a fun game that I play it with my 7 year old so-- bonding. He has a built-in sense of probabilities but this is the perfect opportunity to teach him about probability theory. And B) Let's be honest I would probably wind up doing this anyway but try to do it in my head, do it badly, and then feel not so great about it.
 
-And the dice rolling in this game is FULL of probability theory to teach :)
+Teaching opportunity.
 
 To get an idea how obfuscated the probabilities of certain encounters can get consider this.
 An attacker and defender roll dice, one after the other.
