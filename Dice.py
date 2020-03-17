@@ -316,24 +316,26 @@ def P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_
     pe, def_ev = Def_P(n, focus = def_f, num_evade = def_num_ev)
     print('ph = ', ph)
     print('pe = ', pe)
-    for h in hits:
-            # Example #
-            #   M = N = 3
-            #   P(h = 3) = ph[0]*pe[3]
-            #   P(h = 2) = ph[0]*pe[2] + ph[1]*pe[3]
-            #   P(h = 1) = ph[0]*pe[1] + ph[1]*pe[2] + ph[2]*pe[3]
-            #   P(h = 0) = P(h = 3)P(e >= 3) + P(h = 2)P(e >= 2) + P(h = 1)P(e >= 1) + P(h = 0)P(e >= 0)
-        
+
+    if N>M:
+        ph = np.pad(pe, (n-m, 0), 'constant', constant_values = 0)
+
+    for h in hits:   
         print("### num attack dice =", m, ". num def dice = ", n, 'hits = ', h, )
         p_holder = 0
-        #evade array is in order N to 0 evades, so 0 evades is the last elem.
-        #go from M-h away from the end to the end
         if (h != 0):
-            for i, j in zip(range(m, h-1, -1), range(h, n+1)):
-                # print('i = ', i, 'j = ', j)
-                print('ph elem = ', m-i, 'pe elem = ', j)
-                p_holder = ph[m-i]*(pe[j]) + p_holder
-                #I think this part is good, not sure about below.
+            if (h <= n):
+                # if there are more evade dice than hits, this is already handled nicely I think
+                for i, j in zip(range(m, h-1, -1), range(h, n+1)):
+                    print('ph elem = ', m-i, 'pe elem = ', j)
+                    p_holder = ph[m-i]*(pe[j]) + p_holder
+                # need to figure out how to handle if there are more hits than evade dice
+                # basically when you have run out of evade dice to negate that level
+                # say you can't resolve down to 0 hit from 3 hits if you have only 2 evade die.
+                # basically you don't take the combinations, it's just the straight prob of that roll
+                # to get 1 hit with M = 3 and N = 1 you can have
+                # P(rh = 1) = P(h = 2)*P(e = 1) + P(h = 1)*P(e = 0)
+                # notice we are missing P(h = 3)*P(e = 2)
         if (h == 0):
             for i in range(m, h-1, -1):
                 print('ph elem = ', m-i)
