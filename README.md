@@ -52,3 +52,9 @@ Below is the example of M = 1 to 3 attack dice and N = 1 to 3 defense dice, with
 I'm working on this for the moment. Eventually I will show M = 1 to 6 attack dice, unmodified, target lock, focus, and target lock + focus against N = 1 to 6 defense dice, unmodified, focus, and 1 evade.
 
 So quick math that will be 6x6x4x3 plots or 432 plots. yikes, 24 pages of subplots.
+
+- [x] Accurately Calculate Attack Dice
+- [x] Accurately Calculate Defense Dice
+- [x] Visualize both of the above
+- [x] Accurately Calculate Resolved Hits
+- [ ] Make Plotly interactive viz for Resolved hits combinations to condense all 432 plots.
