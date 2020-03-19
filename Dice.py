@@ -323,11 +323,13 @@ def P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_
         print("### num attack dice =", m, ". num def dice = ", n, 'hits = ', h, )
         p_holder = 0
         # This one case is perfect don't touch.
+        # fewer attack dice than defense dice
         if (m <= n):
             if (h != 0):
                 for i, j in zip(range(m, h-1, -1), range(h, n+1)):
                     print('ph elem = ', m-i, 'pe elem = ', j)
                     p_holder = ph[m-i]*(pe[j]) + p_holder
+            #if zero hits
             if (h == 0):
                 for i in range(m, h-1, -1):
                     print('ph elem = ', m-i)
@@ -336,24 +338,30 @@ def P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_
                         print('pe elem = ', m-k)
                         pe_holder = pe[m-k] + pe_holder
                     p_holder = ph[m-i]*(pe_holder) + p_holder
+        #more attack dice than defense dice
         if (m>n):
             if (len(range(m ,h-1, -1)) >= n):
                 if (h != 0):
-                    for i, j in zip(range(h+1, h-n+1, -1), range(n)):
-                        print('ph elem = ', m-i, 'pe elem = ', j)
-                        p_holder = ph[m-i]*(pe[j]) + p_holder
-                # 
+                    if (h - n >= n):
+                        for i, j in zip(range(m-n-h+1, m-h+1), range(h-n - 1, h-n + 1)):
+                            print('ph elem = ', i, 'pe elem = ', j)
+                            p_holder = ph[i]*(pe[j]) + p_holder
+                    elif (h - n < n):
+                        for i, j in zip(range(m-n-h, m-h+1), range(n+1)):
+                            print('ph elem = ', i, 'pe elem = ', j)
+                            p_holder = ph[i]*(pe[j]) + p_holder
+                #zero hits
                 if (h == 0):
-                    for i in range(m, h-1, -1):
-                        print('ph elem = ', m-i)
+                    for i in range(n+1):
+                        print('ph elem = ', m-n-i)
                         pe_holder = 0
-                        for k in range(m, i-1, -1):
-                            print('pe elem = ', m-k)
-                            pe_holder = pe[m-k] + pe_holder
-                        p_holder = ph[m-i]*(pe_holder) + p_holder
+                        for k in range(m - (m - n - i + 1)):
+                            print('pe elem = ', k)
+                            pe_holder = pe[k] + pe_holder
+                        p_holder = ph[i]*(pe_holder) + p_holder
             elif (len(range(m ,h-1, -1)) < n):
                 if (h != 0):
-                    for i, j in zip(range(m, h-1, -1), range(len(range(m ,h-1, -1)))):
+                    for i, j in zip(range(m, h-1, -1), range(len(range(m ,h-1, -1))+1, len(range(m ,h-1, -1))+2)):
                         print('ph elem = ', m-i, 'pe elem = ', j)
                         p_holder = ph[m-i]*(pe[j]) + p_holder
         
