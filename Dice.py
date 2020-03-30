@@ -305,7 +305,8 @@ def P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_
     n = N
     # M = num of Attack dice
     # N = num of Defense dice
-
+    # if ((m - 1) == n) & (m > 3):
+    #     print('stop to debug')
     Ph_resolved = np.zeros(m+1)
     p_holder = 0
     hits = range(m,-1,-1)
@@ -347,34 +348,38 @@ def P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_
                     p_holder = ph[i]*(pe_holder) + p_holder
         #more attack dice than defense dice
         if (m>n):
-            if (len(range(m ,h-1, -1)) >= n):
-                if (h != 0):
-                    if (h - n >= n):
-                        for i, j in zip(range(m-n-h+1, m-h+1), range(h-n + 1, h-n - 1, -1)):
-                            print('ph elem = ', i, 'pe elem = ', j)
-                            p_holder = ph[i]*(pe[j]) + p_holder
-                    elif (h - n < n):
-                        for i, j in zip(range(m-n-h, m-h+1), range(n+1)):
-                            # print('ph elem = ', i, 'pe elem = ', j)
-                            p_holder = ph[i]*(pe[j]) + p_holder
-                #zero hits
-                if (h == 0):
-                    for i in range(n+1):
-                        # print('ph elem = ', m-n+i)
-                        pe_holder = 0
-                        for k in range(m - (m - n - i + 1)):
-                            # print('pe elem = ', k)
-                            pe_holder = pe[k] + pe_holder
-                        p_holder = ph[m-n+i]*(pe_holder) + p_holder
-            elif (len(range(m ,h-1, -1)) < n):
-                if (h != 0):
-                    for i, j in zip(range(m, h-1, -1), range(len(range(m ,h-1, -1))+1, len(range(m ,h-1, -1))+2)):
-                        # print('ph elem = ', m-i, 'pe elem = ', j)
-                        p_holder = ph[m-i]*(pe[j]) + p_holder
+            # if (len(range(m ,h-1, -1)) >= n):
+            if (h != 0):
+                # if (h - n >= n):
+                mstr = max(0, m-n-h)
+                mend = m-h + 1
+                nstr = max(0, n-(m-h))
+                nend = n + 1
+                for i, j in zip(range(mstr, mend), range(nstr, nend)):
+                    # print('ph elem = ', i, 'pe elem = ', j)
+                    p_holder = ph[i]*(pe[j]) + p_holder
+                # elif (h - n < n):
+                #     for i, j in zip(range(m-n-h, m-h+1), range(n+1)):
+                #         # print('ph elem = ', i, 'pe elem = ', j)
+                #         p_holder = ph[i]*(pe[j]) + p_holder
+            #zero hits
+            if (h == 0):
+                for i in range(m-n, m + 1):
+                    # print('ph elem = ', i)
+                    pe_holder = 0
+                    for k in range(i - (m - n) + 1):
+                        # print('pe elem = ', k)
+                        pe_holder = pe[k] + pe_holder
+                    p_holder = ph[i]*(pe_holder) + p_holder
+            # elif (len(range(m ,h-1, -1)) < n):
+            #     if (h != 0):
+            #         for i, j in zip(range(m, h-1, -1), range(len(range(m ,h-1, -1))+1, len(range(m ,h-1, -1))+2)):
+            #             # print('ph elem = ', m-i, 'pe elem = ', j)
+            #             p_holder = ph[m-i]*(pe[j]) + p_holder
         
         Ph_resolved[m-h] = p_holder
         print('prob of ', h, 'resolved hits = ', Ph_resolved[m-h])
-    print('Ph_resolved sum = ', Ph_resolved.sum())
+    print('------------------Ph_resolved sum = ', Ph_resolved.sum())
 
     EV_resolved = 0
     for i in range(len(Ph_resolved)-1, -1, -1):
@@ -386,8 +391,8 @@ def P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_
 ### plots for hits ####
 M = 5
 N = 5
-for m in range(1, M):
-    for n in range(1, M):
+for m in range(1, M+1):
+    for n in range(1, M+1):
         Ph_resolved, EV_resolved = P_resolved_hits(m, n, atk_f = False, atk_tl = False, def_f = False, def_num_ev = 0)
 
 
@@ -497,3 +502,4 @@ for m in range(1, M):
 #     axes[m].text(0.25, 0.85, s, color = 'black')
 
 # plt.show()
+
