@@ -385,17 +385,33 @@ def P_resolved_hits(M, N, atk_f = False, atk_tl = False, def_f = False, def_num_
     for i in range(len(Ph_resolved)-1, -1, -1):
         EV_resolved = Ph_resolved[i]*(m-i) + EV_resolved
     EV_resolved = round(EV_resolved, 4)
+    Ph_resolved = Ph_resolved.round(4)
+    pe = pe.round(4)
+    ph = ph.round(4)
+    return Ph_resolved, EV_resolved, ph, pe, atk_ev, def_ev
 
-    return Ph_resolved, EV_resolved
+df = pd.DataFrame(columns = ['M_atk_dice', 'N_def_dice', 'Phr', 'Ph', 'Pe', 'atk_tl', 'atk_f', 'def_f', 'def_num_ev', 'EV_res',\
+    'atk_ev', 'def_ev'])
 
 ### plots for hits ####
 M = 5
 N = 5
 for m in range(1, M+1):
     for n in range(1, M+1):
-        Ph_resolved, EV_resolved = P_resolved_hits(m, n, atk_f = False, atk_tl = False, def_f = False, def_num_ev = 0)
+        for af in (True, False):
+            for al in (True, False):
+                for de in (True, False):
+                    for ne in range(0, 3):
+                        Ph_resolved, EV_resolved, ph, pe, atk_Ev, def_ev = \
+                            P_resolved_hits(m, n, atk_f = af, atk_tl = al, def_f = de, def_num_ev = ne)
+                        df_row = pd.Series([m, n, Ph_resolved, EV_resolved, ph, pe, atk_Ev, de, af, al, de, ne], \
+                            index = ['M_atk_dice', 'N_def_dice', 'Phr', 'EV_res', 'ph', 'pe', 'atk_ev', 'def_ev', 'atk_f', 'atk_tl', 'def_f', 'def_num_ev'])
+                        df = df.append(df_row, ignore_index=True)
+
+df.to_csv('Dice_Rolls.csv')
 
 
+#### Preliminary Data Vis ####
 # fig, axes = plt.subplots(4, M, sharey=True, sharex=True)
 # fig.suptitle('X-wing Attack Dice Probability Density Functions (pdf)')
 # axes[0,0].set_ylabel('Target Lock and Focus')
