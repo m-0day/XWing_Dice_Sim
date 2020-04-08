@@ -19,37 +19,54 @@ for i in range(len(df)):
     df['ph'][i] = " ".join(df['ph'][i].split())
     df['ph'][i] = [float(s) for s in df['ph'][i].split(" ")]
 
-
-row = df.iloc[303]
-N = (row['M_atk_dice'])
-nPhr = row.Phr
-nhits = np.arange(M+1)
-
-
+test_len = 20
 fig = go.Figure()
+r = range(test_len)
 
-fig.add_trace(
-    go.Bar(x = hits, 
-    y = Phr)
-)
+for j in r:
+    row = df.iloc[j]
+    M = (row['M_atk_dice'])
+    mPhr = row.Phr
+    mhits = np.arange(M+1)
 
-fig.add_trace(
-    go.Bar(x = nhits,
-    y = nPhr)
-)
+    fig.add_trace(
+        go.Bar(x = mhits, 
+        y = mPhr,
+        visible = False)
+    )
+
+
+c = []
+for j in r:
+    b = [False]*test_len
+    b[j] = True
+    c.append(
+            dict(
+                dict(label = str(j),
+                method = "update",
+                args = [ {"visible": b} ]
+                )
+            )
+        )
 
 
 fig.update_layout(
     updatemenus = [
         dict(
             active = 0,
-            buttons = list([
-                dict(labels = "M",
-                method = "update",
-                args = )
-            ])
+            buttons = c
         )
     ]
 )
+
+#now how do I make it so I have 6 drop downs:
+# M atk dice (1:6)
+# N def dice (1:6)
+# atk_tl    (Yes, No)
+# atk_f     (Yes, No)
+# def_f     (Yes, No)
+# def_evades (0:2)
+
+# and then these correctly combine to index the appropriate bar trace
 
 fig.show()
