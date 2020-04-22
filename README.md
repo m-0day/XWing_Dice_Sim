@@ -15,9 +15,10 @@ Please view my fully interactive binder at:
 
 The widget accurately plots dice rolls for 1-5 attack dice, 1-5 defense dice, target lock (yes/no), attack focus (yes/no), defense focus (yes/no) and 0-2 defensive evade tokens. All in all this is 600 different plots in one widget.
 
-## But Why Do This? Are you insane?
+## But Why Do This?
 
-Maybe, but A) this is a fun game that I play it with my 8 year old so I value the bonding. My son has a built-in sense of probabilities but this is the perfect opportunity to teach him about probability theory. And B) I would be tempted forever do this anyway but try to do it in my head, do it badly, and then feel not so great about it.
+A) this is a fun game that I play it with my 8 year old so I value the bonding. My son has a built-in sense of probabilities but this is the perfect opportunity to teach him about probability theory. And 
+B) I would be tempted forever do this anyway but try to do it in my head, do it badly, and then feel not so great about it.
 
 ### Teaching opportunity.
 
