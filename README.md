@@ -3,7 +3,7 @@
 I made a fully interactive custom dice roll probability calculator for the popular table-top miniatures game Star Wars: X-Wing. Why? Because there are too many modifiers for me to keep track of. Also Why? I wanted to teach my 8 year old about probabilities.
 
 # Click Here for fully interactive binder:
-[My Binder](https://mybinder.org/v2/gh/m-0day/XWing_Dice_Sim/master/InteractiveWidget.ipynb)
+[My Binder](https://mybinder.org/v2/gh/m-0day/XWing_Dice_Sim/master)
 
 (Remember to run all of the cells to generate the plot)
 
