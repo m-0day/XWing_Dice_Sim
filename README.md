@@ -5,7 +5,7 @@ I made a fully interactive custom dice roll probability calculator for the popul
 # Click Here for fully interactive binder:
 [My Binder](https://mybinder.org/v2/gh/m-0day/XWing_Dice_Sim/master)
 
-(Remember to run all of the cells to generate the plot)
+(Click on `InteractiveWidget.ipynb` then Remember to run the cells generate the plot)
 
 ![X-Wing The Tabletop Game](/swz-logotreatment2.png)
 
