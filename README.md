@@ -1,13 +1,25 @@
 # XWing_Dice_Sim
-This accurately simulates the vast combinations of modified dice rolls in the popular table-top miniatures game Star Wars: X-Wing of which I am already a huge fan.
 
-[X-Wing The Tabletop Game](https://www.fantasyflightgames.com/en/products/x-wing/)
+I made a fully interactive custom dice roll probability calculator for the popular table-top miniatures game Star Wars: X-Wing. Why? Because there are too many modifiers for me to keep track of. Also Why? I wanted to teach my 8 year old about probabilities.
+
+![X-Wing The Tabletop Game](/swz-logotreatment2.png)
+
+Please view my fully interactive binder at: 
+[My Binder](https://hub.gke.mybinder.org/user/m-0day-xwing_dice_sim-vll0q79w/notebooks/Untitled.ipynb")
+
+(Remember to run all of the cells to generate the plot)
+
+![Screen Shot](/Capture.PNG)
+
+
+
+The widget accurately plots dice rolls for 1-5 attack dice, 1-5 defense dice, target lock (yes/no), attack focus (yes/no), defense focus (yes/no) and 0-2 defensive evade tokens. All in all this is 600 different plots in one widget.
 
 ## But Why Do This? Are you insane?
 
-Only moderately. But A) this is a fun game that I play it with my 7 year old so-- bonding. He has a built-in sense of probabilities but this is the perfect opportunity to teach him about probability theory. And B) Let's be honest I would probably wind up doing this anyway but try to do it in my head, do it badly, and then feel not so great about it.
+Maybe, but A) this is a fun game that I play it with my 8 year old so I value the bonding. My son has a built-in sense of probabilities but this is the perfect opportunity to teach him about probability theory. And B) I would be tempted forever do this anyway but try to do it in my head, do it badly, and then feel not so great about it.
 
-Teaching opportunity.
+### Teaching opportunity.
 
 To get an idea how obfuscated the probabilities of certain encounters can get consider this.
 An attacker and defender roll dice, one after the other.
@@ -49,12 +61,14 @@ Below is the example of M = 1 to 3 attack dice and N = 1 to 3 defense dice, with
 
 ![Resolved Hits](/Figure_3.png)
 
-I'm working on this for the moment. Eventually I will show M = 1 to 6 attack dice, unmodified, target lock, focus, and target lock + focus against N = 1 to 6 defense dice, unmodified, focus, and 1 evade.
+~~I'm working on this for the moment. Eventually I will show M = 1 to 6 attack dice, unmodified, target lock, focus, and target lock + focus against N = 1 to 6 defense dice, unmodified, focus, and 1 evade.
 
-So quick math that will be 6x6x4x3 plots or 432 plots. yikes, 24 pages of subplots.
+~~So quick math that will be 6x6x4x3 plots or 432 plots. yikes, 24 pages of subplots.
+
+The widget accurately plots dice rolls for 1-5 attack dice, 1-5 defense dice, target lock (yes/no), attack focus (yes/no), defense focus (yes/no) and 0-2 defensive evade tokens. All in all this is 600 different plots in one widget.
 
 - [x] Accurately Calculate Attack Dice
 - [x] Accurately Calculate Defense Dice
 - [x] Visualize both of the above
 - [x] Accurately Calculate Resolved Hits
-- [ ] Make Plotly interactive viz for Resolved hits combinations to condense all 432 plots.
+- [x] Make Plotly interactive viz for Resolved hits combinations to condense all ~~432 plots.~~ 600 plots.
