@@ -1,0 +1,4 @@
+numpy==1.18.*
+pandas
+plotly==4.6.*
+ipywidgets==7.5.*
